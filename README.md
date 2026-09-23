@@ -1,3 +1,5 @@
+<img src="./public/logo.svg" alt="Nexgensis Product Admin" width="300" />
+
 # Product Admin Dashboard
 
 An admin dashboard for the free [DummyJSON](https://dummyjson.com) product catalogue:
@@ -43,8 +45,16 @@ npm run dev
 Open <http://localhost:3000> — you are redirected to `/login`, and after signing in you
 land on `/products`.
 
-No environment variables and no API key are needed: DummyJSON is public and this app
-calls it directly from the browser.
+No API key is needed: DummyJSON is public and this app calls it directly from the
+browser. There is one **optional** variable, used only to make the social-metadata links
+absolute. It has a working default, so you can ignore it:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app   # optional
+```
+
+On Vercel you do not need it at all — the deployment reads `VERCEL_URL` automatically,
+and local development falls back to `http://localhost:3000`.
 
 ### Scripts
 
@@ -276,6 +286,12 @@ app/
     page.tsx                  Suspense boundary around the URL-reading list view
     [id]/page.tsx             Awaits the async params promise
 
+public/                       Static assets, served from the site root
+  favicon.svg                 Brand mark, also the browser tab icon
+  logo.svg                    Full lockup, used at the top of this README
+  site.webmanifest            Installable web-app manifest
+  robots.txt                  Crawler policy
+
 components/
   auth/        AuthGuard, LoginView
   layout/      AppHeader (brand, local-changes counter, user, logout)
@@ -444,6 +460,11 @@ Connect the repository at <https://app.netlify.com/start>, or add `netlify.toml`
 - **Local changes are per browser.** They cannot be shared, and Reset discards them.
 - **No optimistic UI.** The list updates once the API responds, which is honest about
   what happened and simpler to reason about.
+- **No raster social-preview image.** `public/` ships SVG brand assets, and most link
+  previews will not render an SVG. Adding `app/opengraph-image.tsx` using
+  `ImageResponse` from `next/og` would generate a real PNG at build time and let
+  `twitter.card` become `summary_large_image` — a one-file change, left out because the
+  brief did not ask for it.
 - **Next steps I would prioritise:** server-side pagination over a real backend; a
   `proxy.ts` guard once the token moves to a cookie; virtualising the table for page
   sizes above 50; and end-to-end tests (Playwright) for the flows now checked by hand.
