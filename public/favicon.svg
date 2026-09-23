@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Nexgensis">
+  <title>Nexgensis</title>
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5" />
+      <stop offset="1" stop-color="#7c3aed" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="15" fill="url(#brand)" />
+
+  <!-- The same package glyph the app header uses (components/ui/icons.tsx). -->
+  <g
+    transform="translate(16 16) scale(1.3333)"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="1.9"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M3 8.5 12 3.5l9 5v7l-9 5-9-5z" />
+    <path d="m3 8.5 9 5 9-5" />
+    <path d="M12 13.5v7.5" />
+  </g>
+</svg>

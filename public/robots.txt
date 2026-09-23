@@ -1,0 +1,3 @@
+# Nexgensis Product Admin — public demo, so crawling is fine.
+User-agent: *
+Allow: /

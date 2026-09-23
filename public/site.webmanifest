@@ -1,0 +1,18 @@
+{
+  "name": "Nexgensis Product Admin",
+  "short_name": "Product Admin",
+  "description": "Admin dashboard for browsing, searching and managing the DummyJSON product catalogue.",
+  "start_url": "/products",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

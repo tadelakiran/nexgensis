@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 72" width="300" height="72" role="img" aria-label="Nexgensis Product Admin">
+  <title>Nexgensis Product Admin</title>
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5" />
+      <stop offset="1" stop-color="#7c3aed" />
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="64" height="64" rx="15" fill="url(#brand)" />
+  <g
+    transform="translate(20 20) scale(1.3333)"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="1.9"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M3 8.5 12 3.5l9 5v7l-9 5-9-5z" />
+    <path d="m3 8.5 9 5 9-5" />
+    <path d="M12 13.5v7.5" />
+  </g>
+
+  <g font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif">
+    <text x="86" y="36" font-size="26" font-weight="700" fill="#0f172a">Nexgensis</text>
+    <text x="86" y="57" font-size="15" font-weight="500" fill="#64748b">Product Admin</text>
+  </g>
+</svg>
