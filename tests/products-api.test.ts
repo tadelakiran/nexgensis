@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildProductsRequest, type FetchProductsOptions } from "@/lib/api/products";
+import { buildProductsRequest, type FetchProductsOptions } from "@/services/products.service";
 
 /**
  * `buildProductsRequest` is the single place that decides which endpoint a view

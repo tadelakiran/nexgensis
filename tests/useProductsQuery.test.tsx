@@ -3,10 +3,10 @@ import { cleanup, renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { useProductsQuery } from "@/features/products/hooks/useProductsQuery";
 import { ApiError } from "@/lib/axios";
-import type { Product, ProductsResponse } from "@/lib/types";
-import { DEFAULT_QUERY, type ProductQuery } from "@/lib/url-query";
+import type { Product, ProductsResponse } from "@/types/api";
+import { DEFAULT_QUERY, type ProductQuery } from "@/features/products/lib/url-query";
 
 /**
  * The race condition the brief calls out: "if the user types fast, old search
@@ -20,9 +20,9 @@ import { DEFAULT_QUERY, type ProductQuery } from "@/lib/url-query";
  * The product API module is mocked so the tests never touch the network.
  */
 
-vi.mock("@/lib/api/products", () => ({ fetchProducts: vi.fn() }));
+vi.mock("@/services/products.service", () => ({ fetchProducts: vi.fn() }));
 
-import { fetchProducts } from "@/lib/api/products";
+import { fetchProducts } from "@/services/products.service";
 
 const mockFetchProducts = vi.mocked(fetchProducts);
 

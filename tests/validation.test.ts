@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import type { Product, ProductFormValues } from "@/lib/types";
+import type { Product, ProductFormValues } from "@/types/api";
 import {
   EMPTY_PRODUCT_FORM,
   formValuesToPayload,
   hasErrors,
   productToFormValues,
   validateProductForm,
-} from "@/lib/validation";
+} from "@/features/products/lib/validation";
 
 /** A form that should always pass, used as the base for one-field-at-a-time edits. */
 const validForm: ProductFormValues = {

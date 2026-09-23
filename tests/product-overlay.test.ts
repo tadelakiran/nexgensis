@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_QUERY } from "@/lib/url-query";
-import type { Product, ProductWritePayload } from "@/lib/types";
+import { DEFAULT_QUERY } from "@/features/products/lib/url-query";
+import type { Product, ProductWritePayload } from "@/types/api";
 import {
   applyOverlayToList,
   applyOverlayToFetchedProduct,
@@ -15,7 +15,7 @@ import {
   resolveLocalProduct,
   sortProducts,
   type ProductOverlay,
-} from "@/lib/product-overlay";
+} from "@/features/products/lib/product-overlay";
 
 /**
  * The brief: "Add, edit and delete are not really saved by the API. Show the change

@@ -13,7 +13,7 @@ import {
   productsHref,
   queryToParams,
   type ProductQuery,
-} from "@/lib/url-query";
+} from "@/features/products/lib/url-query";
 
 /**
  * The brief calls out `?page=abc` and `?page=999` specifically. These tests pin
