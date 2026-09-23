@@ -10,7 +10,8 @@ fixed it, and where AI helped. Setup steps and the feature list live in
 
 ### The URL is the state container, not React state
 Page, page size, search term, category and sort all live in the query string, and
-nothing is duplicated in component state. `parseQuery` (in `lib/url-query.ts`) is
+nothing is duplicated in component state. `parseQuery` (in
+`features/products/lib/url-query.ts`) is
 the only reader and `queryToParams` the only writer, so refreshing, sharing a link,
 and the browser Back button all work without any extra code.
 
@@ -83,7 +84,7 @@ confirmed by `PUT`ting a new title and re-`GET`ting (original returned), and by
 
 1. performs the genuine HTTP call, so validation, auth headers, error handling and
    failure paths are real rather than simulated; then
-2. records the outcome in a local overlay (`lib/product-overlay.ts`) that is merged
+2. records the outcome in a local overlay (`features/products/lib/product-overlay.ts`) that is merged
    over every server response and persisted to `localStorage`.
 
 Locally created rows get an id from `LOCAL_ID_BASE + n`, because DummyJSON returns the
@@ -189,9 +190,9 @@ The three files worth opening first, in order:
 
 1. `lib/axios.ts` — the one network setup: token injection, error normalisation, and the
    subscriber pattern that keeps it free of React imports.
-2. `hooks/useProductsQuery.ts` — the stale-response guard, and the derived
+2. `features/products/hooks/useProductsQuery.ts` — the stale-response guard, and the derived
    loading-state reasoning.
-3. `lib/api/products.ts` (`buildProductsRequest`) — which endpoint a given view maps to,
+3. `services/products.service.ts` (`buildProductsRequest`) — which endpoint a given view maps to,
    including the search-vs-category rule in one place.
 
 The easiest live changes to make are: add a page size to `PAGE_SIZES`, add a field to

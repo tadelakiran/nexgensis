@@ -1,4 +1,4 @@
-<img src="./public/logo.svg" alt="Nexgensis Product Admin" width="300" />
+<img src="./public/images/logo.svg" alt="Nexgensis Product Admin" width="300" />
 
 # Product Admin Dashboard
 
@@ -130,7 +130,7 @@ and local development falls back to `http://localhost:3000`.
 - [x] Empty / error states for the category list too, without taking the page down
 
 ### Cross-cutting
-- [x] One shared Axios setup; all API calls live in `lib/api/`, never in UI code
+- [x] One shared Axios setup; all API calls live in `src/services/`, never in UI code
 - [x] Page, search, filter and sort persisted in the URL
 - [x] Hand-written debounce, race guard, pagination and table — no library shortcuts
 - [x] 124 tests, clean `typecheck`, clean `lint`, clean production build
@@ -143,7 +143,7 @@ and local development falls back to `http://localhost:3000`.
 
 ### "If the user types fast, old search results must never replace new ones"
 
-Two mechanisms, in `hooks/useProductsQuery.ts`:
+Two mechanisms, in `src/features/products/hooks/useProductsQuery.ts`:
 
 1. **A request id (the correctness guarantee).** Each request takes a monotonically
    increasing id *before* it starts. A response is applied only if its id is still the
@@ -191,7 +191,7 @@ Why not the alternatives:
   from the API".
 
 The rule itself lives in exactly one place, `buildProductsRequest` in
-`lib/api/products.ts`, where search takes precedence if both ever arrive — and
+`src/services/products.service.ts`, where search takes precedence if both ever arrive — and
 `parseQuery` normalises a URL containing both, so what is on screen, what is in the URL
 and what is sent to the API can never disagree.
 
@@ -212,7 +212,7 @@ GET  /products/1                               → still there
 1. It performs the real HTTP call (`POST /products/add`, `PUT /products/{id}`,
    `DELETE /products/{id}`). Nothing is faked, so validation, auth headers, loading
    states and error handling are exercised for real — a failed request is reported.
-2. It records the outcome in a **local overlay** (`lib/product-overlay.ts`) that is merged
+2. It records the outcome in a **local overlay** (`features/products/lib/product-overlay.ts`) that is merged
    over every server response and persisted to `localStorage`.
 
 The overlay holds `created` products, per-id `updated` patches and `deleted` ids.
@@ -248,7 +248,7 @@ Accepted trade-offs, documented rather than hidden:
 | `?category=doesnotexist` | renders an empty state; the select shows the unknown slug rather than looking blank |
 | `?q=x&category=laptops` | both accepted by the parser, then normalised so search wins, matching what is requested |
 
-Every value is whitelisted in `lib/url-query.ts` before it is used, and the URL is
+Every value is whitelisted in `features/products/lib/url-query.ts` before it is used, and the URL is
 *repaired* rather than merely tolerated: the normalised query is compared with the
 address bar and rewritten if they differ, so a hand-edited link becomes a clean canonical
 URL on load. It converges in one step because the canonical form parses back to itself.
@@ -261,7 +261,7 @@ well-formed.
 
 Guarded in both the places a request is triggered by a click:
 
-- `hooks/useProductMutations.ts` keeps a `Set` of in-flight keys in a **ref**.
+- `features/products/hooks/useProductMutations.ts` keeps a `Set` of in-flight keys in a **ref**.
 - The login form and the form dialog each keep an in-flight ref.
 - The confirm dialog owns its own busy state rather than trusting the caller.
 
@@ -274,66 +274,116 @@ fire twice. The ref is mutated synchronously inside the handler, closing that wi
 
 ## Project structure
 
-```
-app/
-  layout.tsx                  Providers, Inter font, metadata
-  page.tsx                    Redirects to /products
-  not-found.tsx               Global 404
-  globals.css                 Tailwind theme tokens, keyframes, base styles
-  login/page.tsx              Await searchParams, validate ?next= server-side
-  products/
-    layout.tsx                AuthGuard + header + footer, applied to every product route
-    page.tsx                  Suspense boundary around the URL-reading list view
-    [id]/page.tsx             Awaits the async params promise
+The layout is feature-modular: `app/` is nothing but routing, and everything a
+feature owns — its components, hooks, types and logic — sits together in
+`features/<name>/`.
 
+```
 public/                       Static assets, served from the site root
-  favicon.svg                 Brand mark, also the browser tab icon
-  logo.svg                    Full lockup, used at the top of this README
+  favicon.svg                 Brand mark, served from the site root (browsers ask for
+                              it there) and wired up as the tab + touch icon
+  images/logo.svg             Full lockup, used at the top of this README
   site.webmanifest            Installable web-app manifest
   robots.txt                  Crawler policy
 
-components/
-  auth/        AuthGuard, LoginView
-  layout/      AppHeader (brand, local-changes counter, user, logout)
-  products/    ProductsView (orchestrator), ProductToolbar, SearchInput, ProductsTable,
-               ProductsCardList, ProductsSkeleton, Pagination, ProductImage,
-               ProductFormDialog, ProductDeleteDialog, ProductDetailView, ProductActions
-  providers/   AuthProvider, ProductsOverlayProvider, ToastProvider
-  ui/          Button, form-controls, Modal, ConfirmDialog, Badge, Rating, StockBadge,
-               StatePanel, icons
+src/
+  app/                        ROUTING ONLY — no components, no fetching
+    layout.tsx                Providers, Inter font, metadata
+    page.tsx                  Redirects to /products
+    loading.tsx               Route-level loading UI
+    error.tsx                 Root error boundary (catches render crashes)
+    not-found.tsx             Global 404
+    globals.css               Tailwind theme tokens, keyframes, base styles
+    (auth)/                   Route group — no URL segment added
+      layout.tsx              Brand panel + centred column, shared by auth pages
+      login/page.tsx          Await searchParams, validate ?next= server-side
+    (dashboard)/              Route group — the protected shell
+      layout.tsx              AuthGuard + header + footer, applied to every product route
+      products/
+        page.tsx              Suspense boundary around the URL-reading list view
+        [id]/page.tsx         Awaits the async params promise
 
-hooks/
-  useProductQuery        URL <-> state, plus URL self-repair
-  useProductsQuery       Fetch a page, with the stale-response guard
-  useProductDetail       One product; local records first, 404 -> not found
-  useProductMutations    Create / update / delete, with duplicate-submit guards
-  useCategories          Category options, independently retryable
-  useDebouncedValue      Generic debounce
+  components/                 GLOBAL UI — knows nothing about products
+    ui/                       Button, form-controls, Modal, ConfirmDialog, Badge, Rating,
+                              StockBadge, StatePanel, Toast + toast-context, icons
+    shared/                   AppHeader (brand, local-changes counter, user, logout),
+                              AppFooter
 
-lib/
-  axios.ts               THE shared Axios instance: token + centralised errors
-  api/auth.ts            POST /auth/login
-  api/products.ts        All product reads/writes + the endpoint-selection rule
-  url-query.ts           Parse / validate / serialise the query string
-  pagination.ts          Ranges, labels, page window (pure)
-  product-overlay.ts     Local writes over API data (pure)
-  validation.ts          Form rules and payload conversion (pure)
-  format.ts              Locale-pinned number, currency and date formatting
-  safe-redirect.ts       Open-redirect guard for ?next=
-  local-storage.ts       SSR-safe storage helpers
-  auth-storage.ts        Session persistence
-  constants.ts           Tunable values and the whitelists used by URL parsing
-  types.ts               DummyJSON response shapes
+  features/                   DOMAIN LOGIC — self-contained per feature
+    auth/
+      AuthProvider.tsx        Session state, wired to the Axios 401 handler
+      context.ts              The context object (so the hook needs no component)
+      types.ts                AuthStatus
+      utils.ts                displayNameOf
+      components/             AuthGuard, LoginForm
+      hooks/                  useAuth
+      lib/                    auth-storage (session persistence)
+    products/
+      ProductsOverlayProvider.tsx   Holds changes DummyJSON will not persist
+      overlay-context.ts      The context object
+      types.ts                Barrel of the feature's public types
+      components/             ProductsView (orchestrator), ProductToolbar, SearchInput,
+                              ProductsTable, ProductsCardList, ProductsSkeleton,
+                              Pagination, ProductImage, ProductFormDialog,
+                              ProductDeleteDialog, ProductDetailView, ProductActions
+      hooks/                  useProductQuery (URL <-> state + self-repair),
+                              useProductsQuery (page fetch + stale-response guard),
+                              useProductDetail, useProductMutations, useCategories,
+                              useProductsOverlay
+      lib/                    url-query, product-overlay, validation (all pure)
 
-tests/                   124 tests: URL parsing, pagination, overlay, validation,
-                         endpoint selection, redirect safety, race conditions
+  hooks/                      GLOBAL reusable hooks
+    useDebouncedValue      Generic debounce
+    useToast               Reads the toast context
+
+  services/                   GLOBAL external API calls — the only place that
+                              talks to DummyJSON
+    auth.service.ts        POST /auth/login
+    products.service.ts    All product reads/writes + the endpoint-selection rule
+
+  lib/                        Core utilities and third-party integration
+    axios.ts               THE shared Axios instance: token + centralised errors
+    pagination.ts          Ranges, labels, page window (pure)
+    format.ts              Locale-pinned number, currency and date formatting
+    safe-redirect.ts       Open-redirect guard for ?next=
+    storage.ts             SSR-safe localStorage helpers
+    constants.ts           Tunable values and the whitelists used by URL parsing
+
+  types/                      GLOBAL types
+    api.ts                 DummyJSON request/response shapes
+
+tests/                        124 tests: URL parsing, pagination, overlay, validation,
+                              endpoint selection, redirect safety, race conditions
 ```
+
+Four deliberate deviations from the textbook structure, and why:
+
+- **`features/products/` instead of `features/projects/`.** The brief mandates the URL
+  `/products/[id]`, so the domain is named the same as the route it serves.
+- **No `dashboard/` route.** The brief fixes `/products` as the list URL, so the
+  protected shell is a `(dashboard)` *route group* — the organisational benefit of a
+  `dashboard/` folder, without changing the URL.
+- **No `features/auth/actions.ts`.** This app has no Server Actions: the token is a
+  bearer token that has to live in the browser, so there is no server-side mutation to
+  expose. An empty `actions.ts` would be dead code.
+- **No `lib/prisma.ts`.** There is no database — the app reads a public REST API.
+
+Three more rules the layout encodes:
+
+- **`app/` holds no logic.** Every `page.tsx` is a few lines: read params, render a
+  feature component. That is what makes the routes readable at a glance.
+- **`features/` may not import from another feature.** Auth and products communicate
+  only through `app/` compositions and `lib/`, so either could be lifted out cleanly.
+- **Contexts live in their own module** (`context.ts`, `overlay-context.ts`,
+  `toast-context.ts`). A hook that needs the context object then does not have to
+  import the provider component, which removes the import cycle and meaningfully
+  shrinks what a consumer's bundle pulls in.
 
 ### Architecture rules I held myself to
 
-1. **No API call in a component.** Every request goes through `lib/api/*`, driven by a
+1. **No API call in a component.** Every request goes through `src/services/*`, driven by a
    hook. Components render; hooks fetch; `lib` holds logic.
-2. **One Axios instance.** `lib/axios.ts` is the only place that knows about base URLs,
+2. **One Axios instance.** `src/lib/axios.ts` is the only place that knows about base URLs,
    tokens or HTTP error shapes.
 3. **Pure logic in `lib`, side effects in hooks.** URL parsing, pagination maths, overlay
    merging and validation are pure functions with no React import, which is what makes
@@ -449,7 +499,7 @@ Connect the repository at <https://app.netlify.com/start>, or add `netlify.toml`
 
 - **The token is in `localStorage`.** Right for a public demo API; a real app handing out
   long-lived credentials should use an httpOnly cookie. The consequence is that route
-  protection is client-side — `components/auth/AuthGuard.tsx` waits for the session to
+  protection is client-side — `features/auth/components/AuthGuard.tsx` waits for the session to
   resolve and then redirects, showing a full-page loader in the meantime so protected
   content never flashes. With an httpOnly cookie I would move the check to a
   `proxy.ts` (Next 16's replacement for middleware) and redirect before rendering.
