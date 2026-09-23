@@ -1,0 +1,17 @@
+# Normalise line endings.
+#
+# Without this, checking the repository out on Windows converts every file to
+# CRLF, which shows up as a whole-file diff the next time someone edits a single
+# line. LF is stored in the repository and used in the working tree everywhere.
+* text=auto eol=lf
+
+# Binary assets that must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+
+# Keep generated lockfile diffs out of the language statistics.
+package-lock.json linguist-generated=true
