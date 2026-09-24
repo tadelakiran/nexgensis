@@ -42,8 +42,14 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000> — you are redirected to `/login`, and after signing in you
+Open <http://localhost:3001> — you are redirected to `/login`, and after signing in you
 land on `/products`.
+
+> **Why 3001 and not the usual 3000?** Something else on this machine (PostgreSQL) is
+already listening on 3000. Windows lets a second socket bind the same port, so `next dev`
+would print "Ready" on 3000 but every request was answered by PostgreSQL and reset — the
+app never loaded. The scripts pass `-p 3001` to stay clear of it; on a machine where 3000
+is free, `npm run dev -- -p 3000` restores the default.
 
 No API key is needed: DummyJSON is public and this app calls it directly from the
 browser. There is one **optional** variable, used only to make the social-metadata links
@@ -60,7 +66,7 @@ and local development falls back to `http://localhost:3000`.
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Development server (Turbopack) on port 3000 |
+| `npm run dev` | Development server (Turbopack) on port 3001 |
 | `npm run build` | Production build |
 | `npm start` | Serve the production build |
 | `npm run lint` | ESLint (Next.js core-web-vitals + TypeScript + `react-hooks`) |
