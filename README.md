@@ -16,8 +16,8 @@ pagination, debouncing and race handling are all written by hand.
 
 | | |
 | --- | --- |
-| Live app | `_add your Vercel / Netlify URL here after deploying (see below)_` |
-| Repository | `_add your public GitHub URL here_` |
+| Live app | https://nexgensis-hazel.vercel.app/login?next=%2Fproducts
+| Repository | https://github.com/tadelakiran/nexgensis
 
 Sign in with:
 
@@ -35,7 +35,7 @@ The login screen has a **Fill demo credentials** button so you do not have to ty
 Requires **Node.js 20.9+** (Next.js 16 dropped Node 18).
 
 ```bash
-git clone <your-repo-url>
+git clone git@github.com:tadelakiran/nexgensis.git
 cd <repo-folder>
 
 npm install
